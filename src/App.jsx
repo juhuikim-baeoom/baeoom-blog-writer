@@ -16,6 +16,25 @@ const INST = {
     address: "서울특별시 강남구 언주로 727, 7층 (트리스빌딩)",
     tel: "1661-9149", url: "https://career.baeoom.com/",
     hashtags: "#배움사이버평생교육원 #배우는즐거움 #기초부터차근히 #학점은행제 #평생교육원",
+    imageStyle: {
+      thumb: `A square illustration with a photorealistic style.
+Warm, sunlit interior with orange accent tones. Korean adult learner in a cozy, trustworthy setting.
+Natural morning light, shallow depth of field, high quality DSLR photography feel.
+Korean text {TITLE} displayed in a straight horizontal line,
+inside a semi-transparent white rectangular overlay box,
+centered in the image, straight and flat layout, no curve, no arc.
+Size: 750x750 pixels, square format.`,
+      mid: `Generate an image without any text or letters.
+Photorealistic lifestyle photography. A Korean adult woman in her 30s~40s
+in a warm, bright environment related to {TOPIC}.
+Orange color accents, cozy and trustworthy atmosphere.
+Natural lighting, high resolution.
+Size: 1200x900 pixels, landscape format.`,
+      cta: `Generate an image without any text or letters.
+Photorealistic style. A smiling Korean woman at a bright home desk or cafe,
+cheerfully engaged with learning. Warm orange tones, welcoming atmosphere.
+Size: 1200x900 pixels, landscape format.`,
+    },
   },
   baeron: {
     id: "baeron", name: "배론원격평생교육원", short: "배론",
@@ -29,6 +48,28 @@ const INST = {
     address: "서울특별시 강서구 양천로 583, A-710호 (염창동, 우림블루나인비즈니스센터)",
     tel: "1688-2465", url: "https://www.baeron.com/",
     hashtags: "#배론원격평생교육원 #배우며논하다 #생각이자라는배움 #학점은행제 #원격평생교육",
+    imageStyle: {
+      thumb: `A square image divided into two sections.
+Top section: a navy blue (#0076BE) full-width banner strip occupying about 25% of the top,
+containing large bold Korean text {TITLE} in white,
+centered, filling about 80% of the banner width.
+Bottom section: a clean line drawing illustration of a Korean adult learner
+related to {TOPIC}. Simple educational props. Soft navy blue pastel background.
+Black outline strokes, flat colors, no shading or gradients.
+Friendly editorial illustration style similar to modern educational infographic characters.
+Size: 750x750 pixels, square format.`,
+      mid: `Generate an image without any text or letters.
+Clean line drawing illustration style. A Korean adult in a quiet study setting,
+engaged with {TOPIC}. Books, notebook, pen as props.
+Soft navy blue pastel background. Black outline strokes, flat colors, no gradients.
+Calm and intellectual mood.
+Size: 1200x900 pixels, landscape format.`,
+      cta: `Generate an image without any text or letters.
+Clean line drawing illustration. A Korean adult looking forward with a confident expression,
+educational items around them. Navy blue pastel tones, thoughtful and inspiring mood.
+Black outline strokes, flat editorial style.
+Size: 1200x900 pixels, landscape format.`,
+    },
   },
   hub: {
     id: "hub", name: "허브원격평생교육원", short: "허브",
@@ -42,6 +83,29 @@ const INST = {
     address: "서울특별시 강서구 양천로 583, 에이-510호 (염창동, 우림블루나인비즈니스센터)",
     tel: "1661-4453", url: "https://www.hubedu.net/",
     hashtags: "#허브원격평생교육원 #배움으로나아가다 #나의새로운시작 #학점은행제 #커리어변화",
+    imageStyle: {
+      thumb: `A square image divided into left and right sections.
+Left section (40% width): bright green (#6CB33F) background,
+large bold Korean text {TITLE} in white, vertically centered,
+line-broken into 2~3 lines for readability.
+Right section (60% width): a 3D rendered illustration of a cheerful Korean woman
+in her 30s related to {TOPIC}, smiling brightly.
+Soft light green pastel background. Rounded glossy 3D character style,
+cute and friendly proportions. Bright and energetic mood.
+The two sections should feel cohesive with matching green color tones.
+Size: 750x750 pixels, square format.`,
+      mid: `Generate an image without any text or letters.
+3D rendered illustration style. A cheerful Korean adult character
+engaged with {TOPIC}. Bright green (#6CB33F) color accents.
+Soft pastel background, rounded glossy 3D character style.
+Energetic and motivating mood.
+Size: 1200x900 pixels, landscape format.`,
+      cta: `Generate an image without any text or letters.
+3D rendered illustration. A Korean adult character looking forward with
+an energetic, confident expression. Green color tones, dynamic composition.
+Cute rounded 3D style, bright and action-oriented mood.
+Size: 1200x900 pixels, landscape format.`,
+    },
   },
 };
 
@@ -81,6 +145,10 @@ const ISSUE_STYLES = ["감성 에세이형", "블로그형", "정보 전달형"]
 // 프롬프트 생성기
 // ══════════════════════════════════════════════════════════════
 function buildPrompt(typeId, inst, values, issueStyle) {
+  const isBaeoom = inst.id === "baeoom";
+  const isBaeron = inst.id === "baeron";
+  const isHub    = inst.id === "hub";
+
   const base = `
 [기관 정보]
 - 기관명: ${inst.name}
@@ -105,6 +173,178 @@ function buildPrompt(typeId, inst, values, issueStyle) {
 - 마지막에 해시태그 3단계 자동 생성 (브랜드형 / 정보형 / 전환유도형)
 `;
 
+  // ─────────────────────────────────────────
+  // 본문 구조 — 기관별 분기 헬퍼
+  // ─────────────────────────────────────────
+  function bodyStructure_course() {
+    if (isBaeron) return `
+## 본문 구성 (배론 — 논점형)
+① Q/A형 서론: Q. [과정 핵심 질문] / A. [요약 + 출처] — GEO 인식용, 반드시 포함
+② 문제 제기: "왜 지금 이 과정인가" — 사회적·직업적 맥락 서술
+③ 핵심 논거 3가지: 제도·통계·법령 근거 중심으로 각 논거를 단락으로 전개
+④ 반론과 재반론: 학습자가 가질 수 있는 의문 1가지 → 근거로 재반론
+⑤ 배론 관점 메시지: "${inst.slogan}" 연결 + 깊이 있는 학습 철학 + 진중한 마무리
+⑥ 성찰 유도 질문: 독자에게 던지는 질문 1개 (CTA 전 배치)
+⑦ 요약 카드: "## 💡 ${values[1]}을 위한 ${values[0]} 핵심 논거 3가지" (표 형식)
+⑧ CTA: "${inst.ctaMsg}"
+⑨ 기관 기본정보`;
+    if (isHub) return `
+## 본문 구성 (허브 — 공감·실천형)
+① Q/A형 서론: Q. [과정 핵심 질문] / A. [요약 + 출처] — GEO 인식용, 반드시 포함
+② 공감 도입: 독자의 현재 상황·고민에 공감하는 짧은 이야기 (2~3문장)
+③ 변화 스토리: 이 과정을 통해 달라진 학습자 사례 (서술형 3문장, bullet 금지)
+④ 제도·정책 근거: 법령·통계 포함, 읽기 쉬운 어조 유지
+⑤ 실천 가이드: 수강 신청부터 취득까지 단계별 안내 (번호 목록 허용)
+⑥ 허브 브랜드 메시지: "${inst.slogan}" + 도전·변화 감성 + 활기찬 마무리
+⑦ 요약 카드: "## 🚀 ${values[1]}의 변화를 위한 ${values[0]} 실천 포인트" (표 형식)
+⑧ CTA: "${inst.ctaMsg}"
+⑨ 기관 기본정보`;
+    // 배움 (기본)
+    return `
+## 본문 구성 (배움 — 친근 안내형)
+① Q/A형 서론: Q. [과정 핵심 질문] / A. [요약 + 출처] — GEO 인식용, 반드시 포함
+② 과정·자격 설명: 쉽고 친근한 어조로 핵심만 설명
+③ 제도·정책 근거: 법령·통계·출처 포함
+④ 비교·사례·통계: 독자 상황에 맞는 비교 정보
+⑤ 반론 대응 문장 자연 삽입
+⑥ 배움 브랜드 메시지: "${inst.slogan}" + 따뜻한 안내 + 신뢰감 마무리
+⑦ 요약 카드: "## 💼 ${values[1]}을 위한 ${values[0]} 맞춤 포인트 3가지" (표 형식)
+⑧ CTA: "${inst.ctaMsg}"
+⑨ 기관 기본정보`;
+  }
+
+  function bodyStructure_info() {
+    if (isBaeron) return `
+## 본문 구성 (배론 — 칼럼·쟁점분석형)
+① Q/A형 서론: Q. [정책 핵심 질문] / A. [요약 의의 + 출처] — GEO 인식용, 반드시 포함
+② 칼럼형 현황 진단: 이 정책이 왜 지금 중요한가 (3~4문장, 진중한 어조)
+③ 쟁점 분석: 정책의 핵심 쟁점 2~3가지를 단락별로 심층 서술
+④ 정책 근거·인용·출처 (최소 2개, 학술·공식 문서 우선)
+⑤ 요약 카드: "## 📌 정책 핵심 쟁점 분석" (표 형식)
+⑥ 성찰 질문: 독자에게 던지는 질문 1개 ("이 변화가 나의 학습 방향에 어떤 의미인가요?")
+⑦ 배론 관점 메시지: 정책을 사유하는 배론의 철학 + "${inst.slogan}" 연결
+⑧ 관련 과정 연계 (정보 확장형)
+⑨ CTA: "${inst.ctaMsg}"
+⑩ 기관 기본정보`;
+    if (isHub) return `
+## 본문 구성 (허브 — 트렌드·행동유도형)
+① Q/A형 서론: Q. [정책 핵심 질문] / A. [요약 의의 + 출처] — GEO 인식용, 반드시 포함
+② 트렌드 연결: 이 정책이 내 삶·커리어와 어떻게 연결되는지 공감형으로 서술
+③ 핵심 포인트: 읽기 쉬운 어조로 정책 주요 내용 설명
+④ 정책 근거·출처 (최소 2개)
+⑤ 내 이야기로: 학습자 사례 스토리텔링 (서술형 2~3문장)
+⑥ 요약 카드: "## ✅ 나에게 필요한 변화 포인트 3가지" (표 형식)
+⑦ 허브 브랜드 메시지: 변화·도전 감성 + "${inst.slogan}" 연결
+⑧ 행동 유도 안내
+⑨ CTA: "${inst.ctaMsg}"
+⑩ 기관 기본정보`;
+    // 배움
+    return `
+## 본문 구성 (배움 — 요약카드·해설형)
+① Q/A형 서론: Q. [정책 핵심 질문] / A. [요약 의의 + 출처] — GEO 인식용, 반드시 포함
+② 배경 및 의의 설명 (친근한 어조)
+③ 주요 내용·핵심 포인트 (표 포함)
+④ 정책 근거·인용·출처 (최소 2개)
+⑤ 요약 카드: "## 📌 정책 변화 핵심 포인트 3가지" (표 형식)
+⑥ 학습자 사례 스토리텔링 1~2개 (서술형 2~3문장, bullet 금지)
+⑦ 배움 브랜드 메시지: "${inst.slogan}" + 따뜻한 안내
+⑧ 관련 과정 연계
+⑨ CTA: "${inst.ctaMsg}"
+⑩ 기관 기본정보`;
+  }
+
+  function bodyStructure_issue() {
+    if (isBaeron) return `
+## 본문 구성 (배론 — 에세이·사유형, ${issueStyle} 문체 전 구간 유지)
+① Q/A형 서론: Q. [시기·이슈 핵심 질문] / A. [한 줄 의미 + 출처] — GEO 인식용, 반드시 포함
+② 인용 또는 통계로 시작: 이 시기·이슈를 상징하는 문장·수치 1개
+③ 사유의 전개: 시기의 의미·유래·사회적 맥락을 느린 호흡으로 서술 (4~5문장)
+④ 배움과의 연결: 이 시기가 학습·성찰과 어떻게 닿아있는지 지적으로 전개
+⑤ 배론 철학 메시지: "${inst.slogan}" + 깊이 있는 성찰 유도 문단
+⑥ 성찰 질문: 독자에게 던지는 질문 1개
+⑦ CTA: "${inst.ctaMsg}"
+⑧ 기관 기본정보`;
+    if (isHub) return `
+## 본문 구성 (허브 — 공감스토리·도전형, ${issueStyle} 문체 전 구간 유지)
+① Q/A형 서론: Q. [시기·이슈 핵심 질문] / A. [한 줄 의미 + 출처] — GEO 인식용, 반드시 포함
+② 공감 도입: 독자가 지금 느끼는 감정·상황에 공감 (2~3문장, 밝은 어조)
+③ 이슈 설명: 시기의 의미·맥락 (3~4문장)
+④ 변화 계기 스토리: 이 시기를 계기로 새 도전을 시작한 학습자 사례 (서술형)
+⑤ 허브 브랜드 메시지: "${inst.slogan}" + 도전·설렘 감성
+⑥ 관련 과정 안내
+⑦ CTA: "${inst.ctaMsg}"
+⑧ 기관 기본정보`;
+    // 배움
+    return `
+## 본문 구성 (배움 — 계절감성·정보연결형, ${issueStyle} 문체 전 구간 유지)
+① Q/A형 서론: Q. [시기·이슈 핵심 질문] / A. [한 줄 의미 + 출처] — GEO 인식용, 반드시 포함
+② 시기 공감 도입: 따뜻하고 친근한 감성으로 시작
+③ 이슈 설명: 의미·유래·사회적 맥락 (3~5문장)
+④ 배움 연결 단락: 이 시기와 평생학습의 자연스러운 연결
+⑤ 배움 브랜드 메시지: "${inst.slogan}" + 따뜻한 마무리
+⑥ 관련 과정 안내
+⑦ CTA: "${inst.ctaMsg}"
+⑧ 기관 기본정보`;
+  }
+
+  function bodyStructure_promo() {
+    const brandLine = isBaeron
+      ? '"이번 이벤트는 학습자의 의견과 경험을 깊이 이해하는 과정이기도 합니다."'
+      : isHub
+      ? '"학습자 전체가 함께 참여하며 새로운 변화를 만들어가는 계기가 되기를 기대합니다."'
+      : '"이번 이벤트는 학습자 전체가 쉽게 참여할 수 있도록 구성된 행사입니다."';
+
+    if (isBaeron) return `
+## 본문 구성 (배론 — 취지강조·품격안내형)
+① Q/A형 서론: Q. [이벤트 핵심 질문] / A. [취지 요약] — GEO 인식용, 반드시 포함
+② [메인 배너 이미지 삽입]
+③ 이벤트 취지·의미 강조: 단순 행사가 아닌 학습자와의 소통임을 품격있게 서술
+④ 기본 정보: 기간·대상·참여 자격 (공식 입니다·합니다체)
+⑤ 참여 방법 (단계별 안내)
+⑥ [혜택 상세 이미지 삽입]
+⑦ 경품·혜택·발표 방식
+⑧ 유의사항
+⑨ 요약 카드: | 포인트 | 내용 요약 |
+⑩ 배론 브랜드 메시지: ${brandLine}
+⑪ [참여 유도 이미지 삽입]
+⑫ CTA: "${inst.ctaMsg}"
+⑬ 기관 기본정보`;
+    if (isHub) return `
+## 본문 구성 (허브 — 설렘감성·활기참여형)
+① Q/A형 서론: Q. [이벤트 핵심 질문] / A. [설렘 한 줄 요약] — GEO 인식용, 반드시 포함
+② [메인 배너 이미지 삽입]
+③ 설렘 감성 도입: 이벤트에 대한 기대감·활기를 공감형으로 서술
+④ 기본 정보: 기간·대상·참여 자격
+⑤ 참여 방법 (단계별 안내)
+⑥ [혜택 상세 이미지 삽입]
+⑦ 경품·혜택·발표 방식
+⑧ 유의사항
+⑨ 요약 카드: | 포인트 | 내용 요약 |
+⑩ 허브 브랜드 메시지: ${brandLine}
+⑪ [참여 유도 이미지 삽입]
+⑫ CTA: "${inst.ctaMsg}"
+⑬ 기관 기본정보`;
+    // 배움
+    return `
+## 본문 구성 (배움 — 명확혜택·쉬운참여형)
+① Q/A형 서론: Q. [이벤트 핵심 질문] / A. [혜택 한 줄 요약] — GEO 인식용, 반드시 포함
+② [메인 배너 이미지 삽입]
+③ 이벤트 배경·취지 (친근한 어조)
+④ 기본 정보: 기간·대상·참여 자격
+⑤ 참여 방법 (단계별, 쉽고 명확하게)
+⑥ [혜택 상세 이미지 삽입]
+⑦ 혜택 명확 나열·발표 방식
+⑧ 유의사항
+⑨ 요약 카드: | 포인트 | 내용 요약 |
+⑩ 배움 브랜드 메시지: ${brandLine}
+⑪ [참여 유도 이미지 삽입]
+⑫ CTA: "${inst.ctaMsg}"
+⑬ 기관 기본정보`;
+  }
+
+  // ─────────────────────────────────────────
+  // 유형별 프롬프트 조합
+  // ─────────────────────────────────────────
   if (typeId === "course") {
     return `당신은 ㈜배움 소속 3개 원격평생교육원의 과정형 블로그 콘텐츠를 작성하는 전문 라이터입니다.
 
@@ -117,7 +357,6 @@ ${base}
 [생성 단계 - 순서대로 실행]
 
 ## 1단계. 검색자 심리·의도 분석
-다음 항목을 간략히 출력하세요:
 - 페르소나 정의 (대상 독자 기반)
 - 검색 의도 타입 (정보형/거래형/비교형 등)
 - 핵심 욕구·불안·문제
@@ -127,35 +366,23 @@ ${base}
 ---
 
 ## 2단계. SEO·GEO 최적화 제목 7개
-
-다음 형식으로 표 출력:
 | 번호 | 제목 | 검색의도매칭 | CTR근거 | 감정반응 | GEO인식 |
 각 제목: 35~55자, 기관명+과정명+자연어질문형 포함
-마지막 줄: ★ 최종 추천 제목: 번호 (근거 1줄)
+★ 최종 추천 제목: 번호 (근거 1줄)
 
 ---
 
 ## 3단계. 자료 조사 패킷
 - 추천 검색 쿼리 5개
-- 핵심 비교 기준 항목 (가격/인증/기간/리스크 등)
-- 정책·제도 근거 (「법령명」 제·조 + 출처 표기)
+- 핵심 비교 기준 항목
+- 정책·제도 근거 (「법령명」 제·조 + 출처)
 - 공식 통계 2개 이상
 - 반론 대응 문장 1개
 
 ---
 
 ## 4단계. 본문 (약 1,500자)
-
-구성 흐름:
-① Q/A형 서론 (GEO용)
-② 과정/자격 설명
-③ 제도·정책 근거 (법령·통계·출처 포함)
-④ 비교·사례·통계
-⑤ 반론 대응 문장 자연 삽입
-⑥ ${inst.name} 브랜드 특화 메시지 (슬로건 연결 + 기관 역할 + 감정 톤 마무리)
-⑦ 요약 카드 섹션: "## 💼 ${values[1]}을 위한 ${values[0]} 맞춤 포인트 3가지" (표 형식)
-⑧ CTA: "${inst.ctaMsg}"
-⑨ 기관 기본정보: ${inst.name}(${inst.address} / 대표전화 ${inst.tel} / ${inst.url})은 '${inst.slogan}'을 슬로건으로 하는 교육부 평가인정 원격평생교육원입니다.
+${bodyStructure_course()}
 
 ---
 ${inst.hashtags}
@@ -174,7 +401,7 @@ ${base}
 [생성 단계 - 순서대로 실행]
 
 ## 1단계. 정책 주제 분류
-다음 중 하나로 분류: ①법령 제정·개정형 ②정책 시행·발표형 ③통계·연구보고형 ④기관 공고·지침형 ⑤사회·교육 트렌드형
+①법령 제정·개정형 ②정책 시행·발표형 ③통계·연구보고형 ④기관 공고·지침형 ⑤사회·교육 트렌드형 중 분류
 → 분류 결과 및 필수 포함 요소 명시
 
 ---
@@ -189,24 +416,12 @@ ${base}
 ## 3단계. 정책 인용·출처 패킷
 - 관련 법령 (「법령명」 제·조)
 - 공식 통계 2개 이상 (수치·출처기관·날짜)
-- 보도자료·공고문 링크 또는 출처
+- 보도자료·공고문 출처
 
 ---
 
 ## 4단계. 본문 (약 1,500자)
-
-구성 흐름:
-① Q/A형 서론: Q. [정책 핵심 질문] / A. [요약 의의 + 출처]
-② 배경 및 의의 설명
-③ 주요 내용·핵심 포인트 (표 포함)
-④ 정책 근거·인용·출처 (최소 2개)
-⑤ 요약 카드: "## 📌 정책 변화 핵심 포인트 3가지" (표 형식)
-⑥ 학습자 사례 스토리텔링 1~2개 (서술형 2~3문장, 페르소나 연결, bullet 나열 금지)
-   → 마지막 문장: "이처럼 [제도/정책]은 [독자 상황]인 분들에게도 현실적인 선택지가 됩니다."
-⑦ 기관 관점 메시지 (필수 3요소: 슬로건 연결 + 기관 역할 + 감정 톤 마무리)
-⑧ 관련 과정 연계 (정보 확장형, 직접 유도 금지)
-⑨ CTA 전 안내문 + "${inst.cta}"
-⑩ 기관 기본정보: ${inst.name}(${inst.address} / 대표전화 ${inst.tel} / ${inst.url})은 '${inst.slogan}'을 슬로건으로 하는 교육부 평가인정 원격평생교육원입니다.
+${bodyStructure_info()}
 
 ---
 ${inst.hashtags}
@@ -240,28 +455,14 @@ ${base}
 ---
 
 ## 2단계. GEO 인식형 제목 5개
-제목 규칙: 시기명 + 기관명 + 감정/정보 키워드 포함, 35~55자
-문체 유형별 스타일:
-- 감성 에세이형 → 서정적·질문형
-- 블로그형 → 자연어 정보형
-- 정보 전달형 → 공식문서형
-
 | 번호 | 제목 | 스타일 | GEO인식 |
-★ 최종 추천 제목 1개 (본문 상단 삽입용)
+제목 규칙: 시기명 + 기관명 + 감정/정보 키워드 포함, 35~55자
+★ 최종 추천 제목 1개
 
 ---
 
-## 3단계. 본문 (약 1,500자, ${issueStyle} 문체 전 구간 유지)
-
-구성:
-① 최종 추천 제목 삽입
-② 시기 공감 도입 (감정 톤: 도입 따뜻함 → 전개 차분함 → 마무리 긍정)
-③ 이슈 설명 (3~5문장, 의미·유래·사회적 맥락, 마지막 문장은 이슈→기관 연결)
-④ 배움 연결 단락
-⑤ ${inst.name} 브랜드 톤 문단 (슬로건·키워드 반영)
-⑥ 관련 과정 안내
-⑦ CTA: "${inst.ctaMsg}"
-⑧ 기관 기본정보
+## 3단계. 본문 (약 1,500자)
+${bodyStructure_issue()}
 
 ---
 ${inst.hashtags}
@@ -281,46 +482,27 @@ ${base}
 [생성 단계 - 순서대로 실행]
 
 ## 1단계. 이벤트 유형 분류
-①참여형 ②경품형 ③캠페인형 ④정보형 행사 중 분류
+①참여형 ②경품형 ③캠페인형 ④정보형 중 분류
 → 필수 포함 요소 명시 (참여자격/기간/응모방식/혜택/발표일정 등)
 
 ---
 
 ## 2단계. GEO 인식형 제목 7개
-규칙: 기관명·이벤트·행사·안내·참여 공식 용어 최소 2개 포함, "학습자 전체" 표현 1회 이상, 35~55자
-
+규칙: 기관명·이벤트·행사·안내·참여 공식 용어 최소 2개 포함, 35~55자
 | 번호 | 제목 | 이벤트유형 | GEO인식 | 감정톤 |
-★ 최종 추천 제목 1~2개 + 근거 (CTR + GEO 기준)
+★ 최종 추천 제목 1~2개 + 근거
 
 ---
 
 ## 3단계. 이미지 삽입 위치 안내
-(이미지 생성 없음 - 업로드 이미지 삽입 위치만 표시)
-① 서론 직후: [메인 배너 이미지 삽입] ALT: "이벤트 메인 안내 이미지(학습자 전체 대상)"
-② 혜택 설명 전후: [혜택 상세 이미지 삽입] ALT: "이벤트 혜택 상세 안내 이미지"
-③ CTA 직전: [참여 유도 이미지 삽입] ALT: "이벤트 참여 유도 이미지"
+① 서론 직후: [메인 배너 이미지 삽입]
+② 혜택 설명 전후: [혜택 상세 이미지 삽입]
+③ CTA 직전: [참여 유도 이미지 삽입]
 
 ---
 
-## 4단계. 본문 (약 1,500자, 공식 안내형 입니다·합니다체)
-
-구성:
-① Q/A형 서론
-② [메인 배너 이미지 삽입]
-③ 이벤트 배경·취지
-④ 기본 정보 (기간·대상: 학습자 전체·참여 자격)
-⑤ 참여 방법 (단계별 안내)
-⑥ [혜택 상세 이미지 삽입]
-⑦ 경품·혜택·발표 방식
-⑧ 유의사항 (중복참여·개인정보·세무 등)
-⑨ 요약 카드: | 포인트 | 내용 요약 | (① 대상 ② 일정 ③ 혜택)
-⑩ 기관 메시지 (브랜드 톤 반영):
-   ${inst.name === "배움사이버평생교육원" ? '"이번 이벤트는 학습자 전체가 쉽게 참여할 수 있도록 구성된 행사입니다."' :
-     inst.name === "배론원격평생교육원" ? '"이번 이벤트는 학습자의 의견과 경험을 깊이 이해하는 과정이기도 합니다."' :
-     '"학습자 전체가 함께 참여하며 새로운 변화를 만들어가는 계기가 되기를 기대합니다."'}
-⑪ [참여 유도 이미지 삽입]
-⑫ CTA: "${inst.ctaMsg}"
-⑬ 기관 기본정보
+## 4단계. 본문 (약 1,500자)
+${bodyStructure_promo()}
 
 ---
 ${inst.hashtags}
@@ -333,7 +515,9 @@ ${inst.hashtags}
 // ══════════════════════════════════════════════════════════════
 // 메인 컴포넌트
 // ══════════════════════════════════════════════════════════════
-function BlogGenerator({ apiKey }) {
+export default function BlogGenerator() {
+  const [apiKey, setApiKey] = useState("");
+  const [apiKeyConfirmed, setApiKeyConfirmed] = useState(false);
   const [step, setStep] = useState(1);
   const [instId, setInstId] = useState(null);
   const [typeId, setTypeId] = useState(null);
@@ -341,7 +525,9 @@ function BlogGenerator({ apiKey }) {
   const [issueStyle, setIssueStyle] = useState("블로그형");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copiedImg, setCopiedImg] = useState(false);
+  const [copiedBody, setCopiedBody] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
 
   // 참고자료
   const [links, setLinks] = useState([""]);
@@ -382,7 +568,12 @@ function BlogGenerator({ apiKey }) {
   async function callAPI(userPrompt, maxTokens) {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: maxTokens || 1500,
@@ -473,48 +664,44 @@ JSON만 출력하세요 (마크다운 없이):
     }
   }
 
-  // 4b: 이미지 프롬프트
+  // 4b: 이미지 프롬프트 (단독 재생성용)
   async function generateImagePrompts() {
     setLoading(true); setError("");
     const finalTitle = editedTitle || (titleCandidates[selectedTitleIdx] ? titleCandidates[selectedTitleIdx].title : "");
-    const prompt = `아래 블로그 포스팅에 사용할 이미지 프롬프트 3개만 작성해주세요. 다른 내용(제목 분석, 본문 등)은 절대 작성하지 마세요.
-
-기관: ${inst.name} | 슬로건: ${inst.slogan} | 대표컬러: ${inst.color}
-블로그 제목: "${finalTitle}"
-주제: ${values[0]} | 대상독자: ${values[1] || "성인학습자"}
-블로그 유형: ${blogType ? blogType.label : ""}
-
-아래 3개의 이미지 프롬프트를 영어로 작성하세요.
-각 프롬프트는 구간 제목(썸네일 / 본문중간 / CTA)을 한국어로 표시하고, 프롬프트 본문은 영어로 작성하세요.
-
-[썸네일 - 750×750]
-- "Generate an image without any text or letters."로 시작
-- 단, 이미지 중앙에 블로그 제목을 15자 이내 한국어로 요약한 텍스트를 오버레이로 배치
-- 형식: overlay bold Korean text: "요약텍스트(15자 이내)"
-- 텍스트 뒤에 가독성을 위한 subtle dark overlay 지시 포함
-- 마지막 줄: Size: 750x750 pixels, square format.
-
-[본문중간 - 1200×900]
-- "Generate an image without any text or letters."로 시작
-- 마지막 줄: Size: 1200x900 pixels, landscape format.
-
-[CTA - 1200×900]
-- "Generate an image without any text or letters."로 시작
-- 마지막 줄: Size: 1200x900 pixels, landscape format.
-
-공통 조건: 한국인 성인학습자 기준, 기관 대표컬러(${inst.color}) 톤 반영, 밝고 신뢰감 있는 분위기, 실사 스타일`;
-    try {
-      const text = await callAPI(prompt, 1000);
-      setImagePrompts(text);
-      setSubStep("4b");
-    } catch(e) {
-      setError("이미지 프롬프트 생성 오류");
-    } finally {
-      setLoading(false);
-    }
+    const text = await callImagePrompts(finalTitle);
+    setImagePrompts(text);
+    setLoading(false);
   }
 
-  // 4c: 본문 + 해시태그 동시 생성
+  async function callImagePrompts(finalTitle) {
+    const shortTitle = finalTitle.length > 15 ? finalTitle.slice(0, 15) : finalTitle;
+    const style = inst.imageStyle;
+    const thumb = style.thumb
+      .replace("{TITLE}", `"${shortTitle}"`)
+      .replace("{TOPIC}", values[0] || "평생교육");
+    const mid = style.mid.replace("{TOPIC}", values[0] || "평생교육");
+    const cta = style.cta.replace("{TOPIC}", values[0] || "평생교육");
+
+    const prompt = `아래 블로그 포스팅에 사용할 이미지 프롬프트 3개를 작성해주세요. 다른 내용은 절대 작성하지 마세요.
+
+기관: ${inst.name} | 블로그 제목: "${finalTitle}" | 주제: ${values[0]}
+
+각 구간 제목(썸네일 / 본문중간 / CTA)을 한국어로 표시하고,
+아래 스타일 가이드를 기반으로 주제와 대상독자(${values[1] || "성인학습자"})에 맞게 구체적인 장면 묘사를 영어로 작성하세요.
+스타일 가이드의 형식과 레이아웃 지시는 반드시 그대로 유지하세요.
+
+[썸네일 스타일 가이드]
+${thumb}
+
+[본문중간 스타일 가이드]
+${mid}
+
+[CTA 스타일 가이드]
+${cta}`;
+    return await callAPI(prompt, 1200);
+  }
+
+  // 4c: 본문 + 이미지 프롬프트 + 해시태그 동시 생성
   async function generateBody() {
     setLoading(true); setError("");
     const finalTitle = editedTitle || (titleCandidates[selectedTitleIdx] ? titleCandidates[selectedTitleIdx].title : "");
@@ -529,9 +716,12 @@ JSON만 출력하세요 (마크다운 없이):
 각 ## 섹션 제목에는 내용에 어울리는 이모지를 앞에 붙여주세요. (예: ## 📌 개요, ## 📋 주요 내용, ## ✅ 정리)
 해시태그는 포함하지 마세요.`;
     try {
-      const text = await callAPI(prompt, 2500);
-      setBodyText(text);
-      // 해시태그도 동시 생성
+      const [bodyResult, imgResult] = await Promise.all([
+        callAPI(prompt, 2500),
+        callImagePrompts(finalTitle),
+      ]);
+      setBodyText(bodyResult);
+      setImagePrompts(imgResult);
       await regenerateHashtags(finalTitle);
       setSubStep("4c");
     } catch(e) {
@@ -608,7 +798,7 @@ JSON만 출력하세요 (마크다운 없이):
     setLinks([""]); setRefText(""); setKeyword("");
     setSubStep("4a"); setTitleCandidates([]); setSelectedTitleIdx(null);
     setEditedTitle(""); setAnalysisText(""); setImagePrompts("");
-    setBodyText(""); setHashtagText(""); setCopied(false); setVerifying(false);
+    setBodyText(""); setHashtagText(""); setCopiedImg(false); setCopiedBody(false); setCopiedAll(false); setVerifying(false);
   }
 
   // UI 헬퍼
@@ -631,17 +821,16 @@ JSON만 출력하세요 (마크다운 없이):
     }} />
   );
 
-  const subStepOrder = ["4a", "4b", "4c"];
-  const subStepLabels = { "4a": "분석·제목", "4b": "이미지", "4c": "본문·해시태그" };
+  const subStepOrder = ["4a", "4c"];
+  const subStepLabels = { "4a": "분석·제목", "4c": "본문·이미지·해시태그" };
 
-  // 7단계 통합 진행 바 데이터
+  // 5단계 통합 진행 바
   const allSteps = [
-    { label: "기관 선택",    active: step >= 1,                                        current: step === 1 },
-    { label: "유형 선택",    active: step >= 2,                                        current: step === 2 },
-    { label: "내용 입력",    active: step >= 3,                                        current: step === 3 },
-    { label: "분석·제목",    active: step === 4,                                       current: step === 4 && subStep === "4a" },
-    { label: "이미지",       active: step === 4 && ["4b","4c"].includes(subStep),      current: step === 4 && subStep === "4b" },
-    { label: "본문·해시태그", active: step === 4 && subStep === "4c",                  current: step === 4 && subStep === "4c" },
+    { label: "기관 선택",          active: step >= 1,               current: step === 1 },
+    { label: "유형 선택",          active: step >= 2,               current: step === 2 },
+    { label: "내용 입력",          active: step >= 3,               current: step === 3 },
+    { label: "분석·제목",          active: step === 4,              current: step === 4 && subStep === "4a" },
+    { label: "본문·이미지·해시태그", active: step === 4 && subStep === "4c", current: step === 4 && subStep === "4c" },
   ];
 
   const btnPrimary = (disabled) => ({
@@ -660,6 +849,42 @@ JSON만 출력하세요 (마크다운 없이):
 
   return (
     <div style={{ fontFamily: "'Noto Sans KR','Apple SD Gothic Neo',sans-serif", minHeight: "100vh", background: "#F1F5F9" }}>
+
+      {/* API 키 입력 화면 */}
+      {!apiKeyConfirmed && (
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "36px 32px", maxWidth: 420, width: "100%", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
+            <div style={{ textAlign: "center", marginBottom: 24 }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>✍️</div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1E293B" }}>(주)배움 블로그 작성기</h2>
+              <p style={{ margin: "8px 0 0", fontSize: 13, color: "#64748B" }}>시작하려면 Anthropic API 키를 입력해주세요</p>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 6 }}>API Key</label>
+              <input
+                type="password"
+                value={apiKey}
+                onChange={e => setApiKey(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && apiKey.startsWith("sk-")) setApiKeyConfirmed(true); }}
+                placeholder="sk-ant-api03-..."
+                style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: "1.5px solid " + (apiKey ? "#F7941D" : "#E2E8F0"), fontSize: 13, color: "#1E293B", outline: "none", boxSizing: "border-box" }}
+              />
+            </div>
+            <button
+              onClick={() => { if (apiKey.startsWith("sk-")) setApiKeyConfirmed(true); }}
+              disabled={!apiKey.startsWith("sk-")}
+              style={{ width: "100%", padding: 12, borderRadius: 10, border: "none", background: apiKey.startsWith("sk-") ? "#F7941D" : "#CBD5E1", color: "#fff", fontSize: 14, fontWeight: 700, cursor: apiKey.startsWith("sk-") ? "pointer" : "not-allowed" }}>
+              시작하기
+            </button>
+            <p style={{ margin: "12px 0 0", fontSize: 11, color: "#94A3B8", textAlign: "center" }}>
+              API 키는 이 세션에서만 사용되며 저장되지 않습니다
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 메인 앱 */}
+      {apiKeyConfirmed && (<>
 
       {/* 헤더 */}
       <div style={{
@@ -683,40 +908,37 @@ JSON만 출력하세요 (마크다운 없이):
         </div>
       </div>
 
-      {/* 6단계 통합 진행 바 */}
+      {/* 진행 바 */}
       <div style={{ background: "#fff", borderBottom: "1px solid #E2E8F0", padding: "14px 24px" }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", position: "relative" }}>
-          {/* 배경 선 전체 */}
-          <div style={{ position: "absolute", top: 11, left: 12, right: 12, height: 2, background: "#E2E8F0", zIndex: 0 }} />
-          {/* 진행된 선 */}
-          <div style={{
-            position: "absolute", top: 11, left: 12, height: 2, zIndex: 1,
-            background: accentColor + "88",
-            width: (() => {
-              const idx = allSteps.findIndex(s => s.current);
-              const total = allSteps.length - 1;
-              return (idx <= 0 ? 0 : (idx / total) * 100) + "%";
-            })(),
-            transition: "width 0.4s"
-          }} />
-          {/* 원 + 라벨 */}
-          <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 2 }}>
-            {allSteps.map((s, i) => (
-              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                <div style={{
-                  width: 24, height: 24, borderRadius: "50%",
-                  background: s.current ? accentColor : s.active ? accentColor + "99" : "#E2E8F0",
-                  color: s.active ? "#fff" : "#94A3B8",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 11, fontWeight: 700,
-                  boxShadow: s.current ? ("0 0 0 3px " + accentColor + "33") : "none",
-                  transition: "all 0.3s"
-                }}>
-                  {s.active && !s.current ? "✓" : i + 1}
-                </div>
-                <span style={{ fontSize: 9, color: s.current ? "#334155" : s.active ? "#64748B" : "#94A3B8", fontWeight: s.current ? 700 : 400, whiteSpace: "nowrap" }}>{s.label}</span>
-              </div>
-            ))}
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "flex-start" }}>
+            {allSteps.map((s, i) => {
+              const isLast = i === allSteps.length - 1;
+              const lineActive = allSteps[i + 1] && (allSteps[i + 1].active || allSteps[i + 1].current);
+              return (
+                <React.Fragment key={i}>
+                  {/* 원 + 라벨 */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, flexShrink: 0 }}>
+                    <div style={{
+                      width: 24, height: 24, borderRadius: "50%",
+                      background: s.current ? accentColor : s.active ? accentColor + "99" : "#E2E8F0",
+                      color: s.active ? "#fff" : "#94A3B8",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, fontWeight: 700,
+                      boxShadow: s.current ? ("0 0 0 3px " + accentColor + "33") : "none",
+                      transition: "all 0.3s"
+                    }}>
+                      {s.active && !s.current ? "✓" : i + 1}
+                    </div>
+                    <span style={{ fontSize: 9, color: s.current ? "#334155" : s.active ? "#64748B" : "#94A3B8", fontWeight: s.current ? 700 : 400, whiteSpace: "nowrap" }}>{s.label}</span>
+                  </div>
+                  {/* 연결선 */}
+                  {!isLast && (
+                    <div style={{ flex: 1, height: 2, marginTop: 11, background: lineActive ? accentColor + "88" : "#E2E8F0", transition: "background 0.3s" }} />
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -1012,39 +1234,54 @@ JSON만 출력하세요 (마크다운 없이):
                 <div style={{ display: "flex", gap: 10 }}>
                   <button onClick={() => setStep(3)} style={btnSecondary()}>← 다시 입력</button>
                   <button onClick={generateTitles} disabled={loading} style={btnSecondary(inst.color)}>🔄 재생성</button>
-                  <button onClick={generateImagePrompts} disabled={selectedTitleIdx === null || loading} style={btnPrimary(selectedTitleIdx === null || loading)}>
-                    {loading ? <><Spinner />생성 중...</> : "이미지 프롬프트 →"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* 4b: 이미지 프롬프트 */}
-            {subStep === "4b" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 16 }}>🖼️</span>
-                  <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1E293B" }}>이미지 프롬프트 확인</h3>
-                </div>
-                <div style={{ background: "#fff", borderRadius: 12, border: "1px solid " + inst.color + "33", padding: 18, whiteSpace: "pre-wrap", fontSize: 13, lineHeight: 1.8, color: "#1E293B", overflowX: "auto" }}>
-                  {imagePrompts}
-                </div>
-                {error && <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "10px 14px", color: "#DC2626", fontSize: 13 }}>{error}</div>}
-                <div style={{ display: "flex", gap: 10 }}>
-                  <button onClick={() => setSubStep("4a")} style={btnSecondary()}>← 제목으로</button>
-                  <button onClick={generateImagePrompts} disabled={loading} style={btnSecondary(inst.color)}>🔄 재생성</button>
-                  <button onClick={generateBody} disabled={loading} style={btnPrimary(loading)}>
+                  <button onClick={generateBody} disabled={selectedTitleIdx === null || loading} style={btnPrimary(selectedTitleIdx === null || loading)}>
                     {loading ? <><Spinner />생성 중...</> : "본문 생성 →"}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* 4c: 본문 + 해시태그 */}
+            {/* 4c: 확정 제목 + 이미지 프롬프트 + 본문 + 해시태그 */}
             {subStep === "4c" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-                {/* 본문 섹션 */}
+                {/* 확정 제목 */}
+                <div style={{ background: inst.bg, borderRadius: 12, padding: "14px 18px", border: "1px solid " + inst.color + "44", display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 16 }}>📌</span>
+                  <div>
+                    <div style={{ fontSize: 11, color: inst.color, fontWeight: 700, marginBottom: 3 }}>확정 제목</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1E293B" }}>
+                      {editedTitle || (titleCandidates[selectedTitleIdx] ? titleCandidates[selectedTitleIdx].title : "")}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 이미지 프롬프트 섹션 */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>🖼️</span>
+                      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1E293B" }}>이미지 프롬프트</h3>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => {
+                        const copy = async () => {
+                          try { await navigator.clipboard.writeText(imagePrompts); }
+                          catch { const el = document.createElement("textarea"); el.value = imagePrompts; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); }
+                          setCopiedImg(true); setTimeout(() => setCopiedImg(false), 2000);
+                        }; copy();
+                      }} style={{ padding: "5px 12px", borderRadius: 8, background: copiedImg ? "#10B981" : "#F1F5F9", color: copiedImg ? "#fff" : "#64748B", border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                        {copiedImg ? "✓ 복사됨" : "📋 복사"}
+                      </button>
+                      <button onClick={generateImagePrompts} disabled={loading} style={{ padding: "5px 12px", borderRadius: 8, background: "#fff", color: inst.color, border: "1.5px solid " + inst.color, fontSize: 12, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer" }}>
+                        {loading ? "생성 중..." : "🔄 재생성"}
+                      </button>
+                    </div>
+                  </div>
+                  <div style={{ background: "#fff", borderRadius: 12, border: "1px solid " + inst.color + "33", padding: 18, whiteSpace: "pre-wrap", fontSize: 12.5, lineHeight: 1.8, color: "#334155", maxHeight: 260, overflowY: "auto" }}>
+                    {imagePrompts || <span style={{ color: "#94A3B8" }}>생성 중...</span>}
+                  </div>
+                </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1053,9 +1290,14 @@ JSON만 출력하세요 (마크다운 없이):
                       <span style={{ fontSize: 11, color: "#94A3B8" }}>{instId === "baeoom" ? "나눔명조" : instId === "baeron" ? "나눔고딕" : "나눔스퀘어"}</span>
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={() => { navigator.clipboard.writeText(bodyText); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                        style={{ padding: "5px 12px", borderRadius: 8, background: copied ? "#10B981" : "#F1F5F9", color: copied ? "#fff" : "#64748B", border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                        {copied ? "✓ 복사됨" : "📋 복사"}
+                      <button onClick={() => {
+                        const copy = async () => {
+                          try { await navigator.clipboard.writeText(bodyText); }
+                          catch { const el = document.createElement("textarea"); el.value = bodyText; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); }
+                          setCopiedBody(true); setTimeout(() => setCopiedBody(false), 2000);
+                        }; copy();
+                      }} style={{ padding: "5px 12px", borderRadius: 8, background: copiedBody ? "#10B981" : "#F1F5F9", color: copiedBody ? "#fff" : "#64748B", border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                        {copiedBody ? "✓ 복사됨" : "📋 복사"}
                       </button>
                       <button onClick={regenerateBodyOnly} disabled={loading} style={{ padding: "5px 12px", borderRadius: 8, background: "#fff", color: inst.color, border: "1.5px solid " + inst.color, fontSize: 12, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer" }}>
                         {loading ? "생성 중..." : "🔄 재생성"}
@@ -1106,16 +1348,22 @@ JSON만 출력하세요 (마크다운 없이):
                 <div style={{ background: inst.bg, borderRadius: 12, padding: 16, border: "1px solid " + inst.color + "22" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: inst.color, marginBottom: 8 }}>🎉 완성! 전체 콘텐츠 복사</div>
                   <div style={{ fontSize: 12, color: inst.textColor, marginBottom: 12 }}>제목 + 본문 + 해시태그가 모두 포함된 최종본을 복사합니다.</div>
-                  <button onClick={() => { navigator.clipboard.writeText(fullContent()); setCopied(true); setTimeout(() => setCopied(false), 2500); }}
-                    style={{ width: "100%", padding: 12, borderRadius: 10, border: "none", background: inst.color, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-                    {copied ? "✓ 복사 완료!" : "📋 전체 복사 (제목+본문+해시태그)"}
+                  <button onClick={() => {
+                    const content = fullContent();
+                    const copy = async () => {
+                      try { await navigator.clipboard.writeText(content); }
+                      catch { const el = document.createElement("textarea"); el.value = content; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); }
+                      setCopiedAll(true); setTimeout(() => setCopiedAll(false), 2500);
+                    }; copy();
+                  }} style={{ width: "100%", padding: 12, borderRadius: 10, border: "none", background: inst.color, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                    {copiedAll ? "✓ 복사 완료!" : "📋 전체 복사 (제목+본문+해시태그)"}
                   </button>
                 </div>
 
                 {error && <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "10px 14px", color: "#DC2626", fontSize: 13 }}>{error}</div>}
 
                 <div style={{ display: "flex", gap: 10 }}>
-                  <button onClick={() => setSubStep("4b")} style={btnSecondary()}>← 이미지로</button>
+                  <button onClick={() => setSubStep("4a")} style={btnSecondary()}>← 제목으로</button>
                   <button onClick={reset} style={{ ...btnSecondary(), flex: 1 }}>✍️ 새 글 작성</button>
                 </div>
               </div>
@@ -1130,57 +1378,7 @@ JSON만 출력하세요 (마크다운 없이):
         @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Nanum+Myeongjo&family=Nanum+Square&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
+      </>)}
     </div>
   );
-}
-
-// ══════════════════════════════════════════════════════════════
-// API 키 게이트 (배포용)
-// ══════════════════════════════════════════════════════════════
-export default function App() {
-  const [apiKey, setApiKey] = React.useState(() => sessionStorage.getItem("baeoom_api_key") || "");
-  const [input, setInput] = React.useState("");
-  const [saved, setSaved] = React.useState(!!sessionStorage.getItem("baeoom_api_key"));
-
-  function handleSave() {
-    if (!input.trim()) return;
-    sessionStorage.setItem("baeoom_api_key", input.trim());
-    setApiKey(input.trim());
-    setSaved(true);
-  }
-
-  if (!saved) {
-    return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg,#FCA5A5,#F9A8C9)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <div style={{ background: "#fff", borderRadius: 20, padding: "40px 36px", maxWidth: 440, width: "100%", boxShadow: "0 8px 40px rgba(0,0,0,0.12)", textAlign: "center" }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>✍️</div>
-          <h1 style={{ fontSize: 20, fontWeight: 800, color: "#1E293B", marginBottom: 8 }}>(주)배움 블로그 작성기</h1>
-          <p style={{ fontSize: 13, color: "#64748B", marginBottom: 28, lineHeight: 1.6 }}>
-            사용을 위해 Anthropic API 키를 입력해주세요.<br />
-            키는 이 브라우저 세션에만 저장되며 외부로 전송되지 않습니다.
-          </p>
-          <input
-            type="password"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleSave()}
-            placeholder="sk-ant-..."
-            style={{ width: "100%", padding: "12px 16px", borderRadius: 10, border: "1.5px solid #E2E8F0", fontSize: 14, outline: "none", marginBottom: 12, boxSizing: "border-box" }}
-          />
-          <button
-            onClick={handleSave}
-            disabled={!input.trim()}
-            style={{ width: "100%", padding: 13, borderRadius: 10, border: "none", background: input.trim() ? "#F43F5E" : "#CBD5E1", color: "#fff", fontSize: 15, fontWeight: 700, cursor: input.trim() ? "pointer" : "not-allowed" }}
-          >
-            시작하기 →
-          </button>
-          <p style={{ fontSize: 11, color: "#94A3B8", marginTop: 16 }}>
-            API 키는 <a href="https://console.anthropic.com" target="_blank" rel="noreferrer" style={{ color: "#F43F5E" }}>console.anthropic.com</a>에서 발급받을 수 있어요.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return <BlogGenerator apiKey={apiKey} />;
 }
