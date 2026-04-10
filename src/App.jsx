@@ -516,8 +516,6 @@ ${inst.hashtags}
 // 메인 컴포넌트
 // ══════════════════════════════════════════════════════════════
 export default function BlogGenerator() {
-  const [apiKey, setApiKey] = useState("");
-  const [apiKeyConfirmed, setApiKeyConfirmed] = useState(false);
   const [step, setStep] = useState(1);
   const [instId, setInstId] = useState(null);
   const [typeId, setTypeId] = useState(null);
@@ -570,7 +568,7 @@ export default function BlogGenerator() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
+        "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true",
       },
@@ -850,41 +848,7 @@ ${cta}`;
   return (
     <div style={{ fontFamily: "'Noto Sans KR','Apple SD Gothic Neo',sans-serif", minHeight: "100vh", background: "#F1F5F9" }}>
 
-      {/* API 키 입력 화면 */}
-      {!apiKeyConfirmed && (
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ background: "#fff", borderRadius: 16, padding: "36px 32px", maxWidth: 420, width: "100%", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>✍️</div>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#1E293B" }}>(주)배움 블로그 작성기</h2>
-              <p style={{ margin: "8px 0 0", fontSize: 13, color: "#64748B" }}>시작하려면 Anthropic API 키를 입력해주세요</p>
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 6 }}>API Key</label>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={e => setApiKey(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter" && apiKey.startsWith("sk-")) setApiKeyConfirmed(true); }}
-                placeholder="sk-ant-api03-..."
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: "1.5px solid " + (apiKey ? "#F7941D" : "#E2E8F0"), fontSize: 13, color: "#1E293B", outline: "none", boxSizing: "border-box" }}
-              />
-            </div>
-            <button
-              onClick={() => { if (apiKey.startsWith("sk-")) setApiKeyConfirmed(true); }}
-              disabled={!apiKey.startsWith("sk-")}
-              style={{ width: "100%", padding: 12, borderRadius: 10, border: "none", background: apiKey.startsWith("sk-") ? "#F7941D" : "#CBD5E1", color: "#fff", fontSize: 14, fontWeight: 700, cursor: apiKey.startsWith("sk-") ? "pointer" : "not-allowed" }}>
-              시작하기
-            </button>
-            <p style={{ margin: "12px 0 0", fontSize: 11, color: "#94A3B8", textAlign: "center" }}>
-              API 키는 이 세션에서만 사용되며 저장되지 않습니다
-            </p>
-          </div>
-        </div>
-      )}
 
-      {/* 메인 앱 */}
-      {apiKeyConfirmed && (<>
 
       {/* 헤더 */}
       <div style={{
@@ -1378,7 +1342,6 @@ ${cta}`;
         @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Nanum+Myeongjo&family=Nanum+Square&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
-      </>)}
     </div>
   );
 }
