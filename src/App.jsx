@@ -118,7 +118,7 @@ function buildPrompt(typeId, inst, values, issueStyle) {
     ? `① Q/A형 서론 ② 문제 제기 ③ 핵심 논거 3가지 ④ 반론과 재반론 ⑤ 배론 관점 메시지 ⑥ 성찰 유도 질문 ⑦ 요약 카드 ⑧ CTA ⑨ 기관 기본정보`
     : isHub
     ? `① Q/A형 서론 ② 공감 도입 ③ 변화 스토리 ④ 제도·정책 근거 ⑤ 실천 가이드 ⑥ 허브 브랜드 메시지 ⑦ 요약 카드 ⑧ CTA ⑨ 기관 기본정보`
-    : `① Q/A형 서론 ② 과정·자격 설명 ③ 제도·정책 근거 ④ 비교·사례·통계 ⑤ 배움 브랜드 메시지 ⑦ 요약 카드 ⑧ CTA ⑨ 기관 기본정보`;
+    : `① Q/A형 서론 ② 과정·자격 설명 ③ 제도·정책 근거 ④ 비교·사례·통계 ⑤ 반론 대응 문장 ⑥ 배움 브랜드 메시지 ⑦ 요약 카드 ⑧ CTA ⑨ 기관 기본정보`;
 
   const infoBody = isBaeron
     ? `① Q/A형 서론 ② 칼럼형 현황 진단 ③ 쟁점 분석 2~3가지 ④ 정책 근거·인용·출처 ⑤ 요약 카드 ⑥ 성찰 질문 ⑦ 배론 관점 메시지 ⑧ CTA ⑨ 기관 기본정보`
@@ -152,6 +152,85 @@ function buildPrompt(typeId, inst, values, issueStyle) {
   if (typeId === "promo") return `당신은 ㈜배움 소속 원격평생교육원 전문 블로그 콘텐츠 라이터입니다.\n\n${base}\n\n[입력값]\n- 이벤트 유형: ${values[0]}\n- 이벤트 주제: ${values[1]}\n\n## 1단계. 이벤트 유형 분류\n## 2단계. GEO 인식형 제목 7개\n${titleJson}\n## 3단계. 이미지 삽입 위치 안내\n## 4단계. 본문 (약 1,500자)\n${promoBody}\n\n${inst.hashtags}`;
 
   return "";
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// 본문 전용 프롬프트 생성기 (1~3단계 분석 없이 본문만)
+// ══════════════════════════════════════════════════════════════
+function buildBodyPrompt(typeId, inst, values, issueStyle) {
+  const isBaeoom = inst.id === 'baeoom';
+  const isBaeron = inst.id === 'baeron';
+  const isHub    = inst.id === 'hub';
+
+  const base = `[기관 정보]
+- 기관명: ${inst.name}
+- 슬로건: "${inst.slogan}" / 테마: ${inst.theme}
+- 핵심 키워드: ${inst.keywords.join('·')}
+- 감정 톤: ${inst.tone}
+- 대표 문장: ${inst.brandMsg}
+- CTA 문구: "${inst.cta}" / "${inst.ctaMsg}"
+- 기관 주소: ${inst.address}
+- 대표전화: ${inst.tel}
+- 공식 URL: ${inst.url}
+- 해시태그: ${inst.hashtags}
+
+[공통 품질 규칙]
+- 총 분량: 약 1,500자 내외
+- Markdown 구조 유지, 섹션 간 --- 구분
+- 금지 표현: "단기완성", "초특가", "100% 합격", "무조건", "폭발적" 등 과장·자극형 표현 금지
+- 공식 출처 최소 2개 이상 포함
+- 기관 공식 URL 하이퍼링크 1회 이상 포함`;
+
+  const courseBody = isBaeron
+    ? `① Q/A형 서론 ② 문제 제기 ③ 핵심 논거 3가지 ④ 반론과 재반론 ⑤ 배론 관점 메시지 ⑥ 성찰 유도 질문 ⑦ 요약 카드 ⑧ CTA ⑨ 기관 기본정보`
+    : isHub
+    ? `① Q/A형 서론 ② 공감 도입 ③ 변화 스토리 ④ 제도·정책 근거 ⑤ 실천 가이드 ⑥ 허브 브랜드 메시지 ⑦ 요약 카드 ⑧ CTA ⑨ 기관 기본정보`
+    : `① Q/A형 서론 ② 과정·자격 설명 ③ 제도·정책 근거 ④ 비교·사례·통계 ⑤ 배움 브랜드 메시지 ⑦ 요약 카드 ⑧ CTA ⑨ 기관 기본정보`;
+
+  const infoBody = isBaeron
+    ? `① Q/A형 서론 ② 칼럼형 현황 진단 ③ 쟁점 분석 2~3가지 ④ 정책 근거·인용·출처 ⑤ 요약 카드 ⑥ 성찰 질문 ⑦ 배론 관점 메시지 ⑧ CTA ⑨ 기관 기본정보`
+    : isHub
+    ? `① Q/A형 서론 ② 트렌드 연결 ③ 핵심 포인트 ④ 정책 근거·출처 ⑤ 내 이야기로 ⑥ 요약 카드 ⑦ 허브 브랜드 메시지 ⑧ CTA ⑨ 기관 기본정보`
+    : `① Q/A형 서론 ② 배경 및 의의 설명 ③ 주요 내용·핵심 포인트 ④ 정책 근거·인용·출처 ⑤ 요약 카드 ⑥ 학습자 사례 ⑦ 배움 브랜드 메시지 ⑧ CTA ⑨ 기관 기본정보`;
+
+  const issueBody = isBaeron
+    ? `① Q/A형 서론 ② 인용 또는 통계 ③ 사유의 전개 ④ 배움과의 연결 ⑤ 배론 철학 메시지 ⑥ 성찰 질문 ⑦ CTA ⑧ 기관 기본정보`
+    : isHub
+    ? `① Q/A형 서론 ② 공감 도입 ③ 이슈 설명 ④ 변화 계기 스토리 ⑤ 허브 브랜드 메시지 ⑥ 관련 과정 안내 ⑦ CTA ⑧ 기관 기본정보`
+    : `① Q/A형 서론 ② 시기 공감 도입 ③ 이슈 설명 ④ 배움 연결 단락 ⑤ 배움 브랜드 메시지 ⑥ 관련 과정 안내 ⑦ CTA ⑧ 기관 기본정보`;
+
+  const promoBody = isBaeron
+    ? `① Q/A형 서론 ② 이벤트 취지·의미 ③ 기본 정보 ④ 참여 방법 ⑤ 경품·혜택·발표 ⑥ 유의사항 ⑦ 요약 카드 ⑧ 배론 브랜드 메시지 ⑨ CTA ⑩ 기관 기본정보`
+    : isHub
+    ? `① Q/A형 서론 ② 설렘 감성 도입 ③ 기본 정보 ④ 참여 방법 ⑤ 경품·혜택·발표 ⑥ 유의사항 ⑦ 요약 카드 ⑧ 허브 브랜드 메시지 ⑨ CTA ⑩ 기관 기본정보`
+    : `① Q/A형 서론 ② 이벤트 배경·취지 ③ 기본 정보 ④ 참여 방법 ⑤ 혜택 명확 나열 ⑥ 유의사항 ⑦ 요약 카드 ⑧ 배움 브랜드 메시지 ⑨ CTA ⑩ 기관 기본정보`;
+
+  const bodyMap = { course: courseBody, info: infoBody, issue: issueBody, promo: promoBody };
+  const inputDesc = typeId === 'course' ? `과정/자격증명: ${values[0]}
+대상 독자: ${values[1]}`
+    : typeId === 'info' ? `정책·법령·주제: ${values[0]}
+대상 독자: ${values[1]}`
+    : typeId === 'issue' ? `시기·이슈: ${values[0]}
+대상 독자: ${values[1]}
+문체 유형: ${issueStyle}`
+    : `이벤트 유형: ${values[0]}
+이벤트 주제: ${values[1]}`;
+
+  return `당신은 ㈜배움 소속 원격평생교육원 전문 블로그 콘텐츠 라이터입니다.
+
+${base}
+
+[입력값]
+${inputDesc}
+
+[본문 구성]
+${bodyMap[typeId] || ''}
+
+위 본문 구성 순서대로 약 1,500자의 완성된 블로그 본문을 작성하세요.
+- Markdown 형식, 각 ## 섹션 제목에는 이모지를 앞에 붙여주세요
+- 해시태그는 포함하지 마세요
+- 분석, 단계 번호, 제목 후보 등 작성 과정은 출력하지 마세요. 본문만 출력하세요`;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -391,7 +470,7 @@ export default function BlogGenerator() {
 
   async function generateTitles() {
     setLoading(true); setError("");
-    const prompt = buildPrompt(typeId, inst, values, issueStyle) + refSuffix() + `\n\n━━━━━━━━━━━━━━━━━━━━━━\n지금은 [분석 + 제목]만 작성하세요. 본문은 작성하지 마세요.\n\n## 1단계. 검색자 심리 분석 (3줄 이내)\n\n## 2단계. SEO·GEO 최적화 제목 7개\n반드시 아래 JSON 배열 형식으로만 출력:\n[\n  {"title": "제목1", "tag": "정보형·GEO✓"},\n  {"title": "제목2", "tag": "전환형·SEO✓"},\n  {"title": "제목3", "tag": "과정형·GEO✓"},\n  {"title": "제목4", "tag": "감성형·GEO△"},\n  {"title": "제목5", "tag": "정보형·SEO✓"},\n  {"title": "제목6", "tag": "전환형·GEO✓"},\n  {"title": "제목7", "tag": "과정형·SEO✓"}\n]\n★ 추천: 번호와 근거 1줄`;
+    const prompt = buildBodyPrompt(typeId, inst, values, issueStyle) + refSuffix() + `\n\n확정 제목: "${ft}"\n\n위 지침대로 본문만 작성하세요. 분석·단계 번호는 출력하지 마세요.`;
     try {
       const text = await callAPI(prompt, 1200);
       const m = text.match(/\[[\s\S]*?\]/);
@@ -436,7 +515,7 @@ export default function BlogGenerator() {
   async function generateBody() {
     setLoading(true); setError(""); setSaved(false);
     const ft = editedTitle || (titleCandidates[selectedTitleIdx] ? titleCandidates[selectedTitleIdx].title : "");
-    const basePrompt = buildPrompt(typeId, inst, values, issueStyle) + refSuffix() + `\n\n━━━━━━━━━━━━━━━━━━━━━━\n확정 제목: "${ft}"\n\n본문만 작성하세요. 약 1,500자의 완성된 블로그 본문을 Markdown 형식으로 작성하세요.\n각 ## 섹션 제목에는 이모지를 앞에 붙여주세요.\n해시태그는 포함하지 마세요.`;
+    const basePrompt = buildBodyPrompt(typeId, inst, values, issueStyle) + refSuffix() + `\n\n확정 제목: "${ft}"\n\n위 지침대로 본문만 작성하세요. 분석·단계 번호는 출력하지 마세요.`;
     try {
       const [bodyResult, imgResult] = await Promise.all([callAPI(basePrompt, 2500), callImagePrompts(ft)]);
       setBodyText(bodyResult); setImagePrompts(imgResult);
@@ -451,7 +530,7 @@ export default function BlogGenerator() {
   async function regenerateBodyOnly() {
     setLoading(true); setError(""); setSaved(false);
     const ft = editedTitle || (titleCandidates[selectedTitleIdx] ? titleCandidates[selectedTitleIdx].title : "");
-    const prompt = buildPrompt(typeId, inst, values, issueStyle) + refSuffix() + `\n\n━━━━━━━━━━━━━━━━━━━━━━\n확정 제목: "${ft}"\n\n본문만 작성하세요. 약 1,500자의 완성된 블로그 본문을 Markdown 형식으로 작성하세요.\n각 ## 섹션 제목에는 이모지를 앞에 붙여주세요.\n해시태그는 포함하지 마세요.`;
+    const prompt = buildBodyPrompt(typeId, inst, values, issueStyle) + refSuffix() + `\n\n확정 제목: "${ft}"\n\n위 지침대로 본문만 작성하세요. 분석·단계 번호는 출력하지 마세요.`;
     try { setBodyText(await callAPI(prompt, 2500)); }
     catch(e) { setError("본문 재생성 오류"); }
     finally { setLoading(false); }
