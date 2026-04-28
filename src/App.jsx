@@ -470,7 +470,7 @@ export default function BlogGenerator() {
 
   async function generateTitles() {
     setLoading(true); setError("");
-    const prompt = buildBodyPrompt(typeId, inst, values, issueStyle) + refSuffix() + `\n\n확정 제목: "${ft}"\n\n위 지침대로 본문만 작성하세요. 분석·단계 번호는 출력하지 마세요.`;
+    const prompt = buildPrompt(typeId, inst, values, issueStyle) + refSuffix();
     try {
       const text = await callAPI(prompt, 1200);
       const m = text.match(/\[[\s\S]*?\]/);
