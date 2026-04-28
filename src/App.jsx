@@ -294,31 +294,50 @@ function Dashboard() {
 // ══════════════════════════════════════════════════════════════
 // 메인 컴포넌트
 // ══════════════════════════════════════════════════════════════
+const LS_KEY = "blog_writer_state";
+
+function loadLS() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch { return {}; }
+}
+
 export default function BlogGenerator() {
+  const _ls = loadLS();
   const [activeTab, setActiveTab] = useState("writer");
-  const [step, setStep] = useState(1);
-  const [instId, setInstId] = useState(null);
-  const [typeId, setTypeId] = useState(null);
-  const [values, setValues] = useState(["", ""]);
-  const [issueStyle, setIssueStyle] = useState("블로그형");
+  const [step, setStep] = useState(_ls.step || 1);
+  const [instId, setInstId] = useState(_ls.instId || null);
+  const [typeId, setTypeId] = useState(_ls.typeId || null);
+  const [values, setValues] = useState(_ls.values || ["", ""]);
+  const [issueStyle, setIssueStyle] = useState(_ls.issueStyle || "블로그형");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copiedImg, setCopiedImg] = useState(false);
   const [copiedBody, setCopiedBody] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
-  const [links, setLinks] = useState([""]);
-  const [refText, setRefText] = useState("");
-  const [keyword, setKeyword] = useState("");
-  const [subStep, setSubStep] = useState("4a");
-  const [titleCandidates, setTitleCandidates] = useState([]);
-  const [selectedTitleIdx, setSelectedTitleIdx] = useState(null);
-  const [editedTitle, setEditedTitle] = useState("");
-  const [analysisText, setAnalysisText] = useState("");
-  const [imagePrompts, setImagePrompts] = useState("");
-  const [bodyText, setBodyText] = useState("");
-  const [hashtagText, setHashtagText] = useState("");
+  const [links, setLinks] = useState(_ls.links || [""]);
+  const [refText, setRefText] = useState(_ls.refText || "");
+  const [keyword, setKeyword] = useState(_ls.keyword || "");
+  const [subStep, setSubStep] = useState(_ls.subStep || "4a");
+  const [titleCandidates, setTitleCandidates] = useState(_ls.titleCandidates || []);
+  const [selectedTitleIdx, setSelectedTitleIdx] = useState(_ls.selectedTitleIdx ?? null);
+  const [editedTitle, setEditedTitle] = useState(_ls.editedTitle || "");
+  const [analysisText, setAnalysisText] = useState(_ls.analysisText || "");
+  const [imagePrompts, setImagePrompts] = useState(_ls.imagePrompts || "");
+  const [bodyText, setBodyText] = useState(_ls.bodyText || "");
+  const [hashtagText, setHashtagText] = useState(_ls.hashtagText || "");
   const [verifying, setVerifying] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // state 변경될 때마다 localStorage에 저장
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        step, instId, typeId, values, issueStyle,
+        links, refText, keyword, subStep,
+        titleCandidates, selectedTitleIdx, editedTitle,
+        analysisText, imagePrompts, bodyText, hashtagText,
+      }));
+    } catch {}
+  }, [step, instId, typeId, values, issueStyle, links, refText, keyword, subStep, titleCandidates, selectedTitleIdx, editedTitle, analysisText, imagePrompts, bodyText, hashtagText]);
 
   const inst = instId ? INST[instId] : null;
   const blogType = typeId ? BLOG_TYPES.find(t => t.id === typeId) : null;
@@ -457,6 +476,7 @@ export default function BlogGenerator() {
     setSelectedTitleIdx(null); setEditedTitle(""); setAnalysisText(""); setImagePrompts("");
     setBodyText(""); setHashtagText(""); setCopiedImg(false); setCopiedBody(false); setCopiedAll(false);
     setVerifying(false); setSaved(false);
+    try { localStorage.removeItem(LS_KEY); } catch {}
   }
 
   const Pill = ({ label, active, color, onClick }) => (
